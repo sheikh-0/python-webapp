@@ -45,11 +45,11 @@ workflows:
           dockerfile: Dockerfile
           path: ~/project
           #profile-name: <my-profile-name>
-          repo: ${MY_APP_PREFIX}
+          repo: python-webapp
           tag: '${CIRCLE_SHA1}'
       - aws-ecs/deploy-service-update:
           requires:
             - aws-ecr/build-and-push-image # only run the deployment job once the build and push image job has completed
-          family: '${MY_APP_PREFIX}-service'
-          cluster:'${MY_APP_PREFIX}-cluster'
-          container-image-name-updates: 'container=${MY_APP_PREFIX}-service,tag=${CIRCLE_SHA1}'
+          family: python-webapp
+          cluster: python-webapp-cluster
+          container-image-name-updates: 'container=python-webapp,tag=${CIRCLE_SHA1}'
