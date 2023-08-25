@@ -1,55 +1,18 @@
 version: 2.1
+
 orbs:
-  python: circleci/python@2.0.3
-  heroku: circleci/heroku@1.2.6
-  aws-ecr: circleci/aws-ecr@9.0.0 # Use the AWS ECR orb in your configuration
-  aws-ecs: circleci/aws-ecs@4.0.0 # Use the AWS ECS orb in your configuration
-
-jobs:
-  build_and_test: # this can be any name you choose
-    executor: python/default
-    steps:
-      - checkout
-      - python/install-packages:
-          pkg-manager: pip
-      - run:
-          name: Run tests
-          command: python -m unittest discover
-      - persist_to_workspace:
-          root: ~/project
-          paths:
-            - .
-
-#  deploy: # this can be any name you choose
-#    executor: python/default
-#    steps:
-#      - attach_workspace:
-#          at: ~/project
-#      - heroku/deploy-via-git:
-#          force: true # force push when pushing to the heroku remote, see: https://devcenter.heroku.com/articles/git
+  aws-ecr: circleci/aws-ecr@9.0.0
+  aws-ecs: circleci/aws-ecs@04.0.0
 
 workflows:
-  test_my_app:
-    jobs:
-      - build_and_test
-#     - deploy:
-#          requires:
-#            - build_and_test # only deploy if the build_and_test job has completed
-#          filters:
-#            branches:
-#              only: main # only deploy when on main
-
   build-and-deploy:
     jobs:
       - aws-ecr/build-and-push-image:
-          dockerfile: Dockerfile
-          path: ~/project
-          #profile-name: <my-profile-name>
-          repo: python-webapp
-          tag: '${CIRCLE_SHA1}'
+          repo: "python-webapp"
+          tag: "${CIRCLE_SHA1}"
       - aws-ecs/deploy-service-update:
           requires:
-            - aws-ecr/build-and-push-image # only run the deployment job once the build and push image job has completed
-          family: python-webapp
-          cluster: python-webapp-cluster
-          container-image-name-updates: 'container=python-webapp,tag=${CIRCLE_SHA1}'
+            - aws-ecr/build-and-push-image # only run this job once aws-ecr/build-and-push-image has completed
+          family: "python-webapp-service"
+          cluster: "python-webapp-cluster"
+          container-image-name-updates: "container=python-webapp-service,tag=${CIRCLE_SHA1}"
