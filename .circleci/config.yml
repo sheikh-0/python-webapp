@@ -43,5 +43,5 @@ workflows:
       - verify-deployment:
           requires:
             - aws-ecs/deploy-service-update
-      context:
-        - global
+  context:
+    - global
