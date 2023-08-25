@@ -62,7 +62,8 @@ jobs:
           command: |
             aws ecr get-login-password | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPOSITORY_NAME} #${AWS_ECR_REGISTRY_URL}
             #eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
-            docker push python-webapp #docker push $FULL_IMAGE_NAME
+            echo "Pushing ${FULL_IMAGE_NAME} ..."
+            docker push $FULL_IMAGE_NAME
       - aws-ecs/update-service:
           family: "${ECS_SERVICE_NAME}"
           cluster-name: "${ECS_CLUSTER_NAME}"
