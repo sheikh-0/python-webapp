@@ -26,13 +26,6 @@ jobs:
             sleep 10
             docker run --network container:built-image appropriate/curl --retry 10 --retry-connrefused http://localhost:8000 | grep "python"
       - run:
-          name: Push image
-          command: |
-            aws ecr get-login-password | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPOSITORY_NAME} #${AWS_ECR_REGISTRY_URL}
-            #eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
-            ls -a
-            docker push 234548314394.dkr.ecr.us-east-1.amazonaws.com/python-webapp/python-webapp:latest
-      - run:
           name: Save image to an archive
           command: |
             mkdir docker-image
