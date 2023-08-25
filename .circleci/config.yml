@@ -5,14 +5,10 @@ orbs:
 jobs:
   build:  
     docker:
-      - image: circleci/golang:1.8
+      - image: cimg/python:3.9
     steps:
       - checkout
       - setup_remote_docker
-      - run:
-          name: Make the executable
-          command: |
-            go build -o demo-app src/main.go
       - run:
           name: Setup common environment variables
           command: |
@@ -27,7 +23,7 @@ jobs:
           command: |
             docker run -d -p 8080:8080 --name built-image $FULL_IMAGE_NAME
             sleep 10
-            docker run --network container:built-image appropriate/curl --retry 10 --retry-connrefused http://localhost:8080 | grep "Hello World!"
+            docker run --network container:built-image appropriate/curl --retry 10 --retry-connrefused http://localhost:8000 | grep "python"
       - run:
           name: Save image to an archive
           command: |
@@ -39,7 +35,7 @@ jobs:
             - docker-image
   deploy:  
     docker:
-      - image: circleci/python:3.6.1
+      - image: cimg/python:3.9
     environment:
       AWS_DEFAULT_OUTPUT: json
     steps:
@@ -80,12 +76,16 @@ jobs:
             ELB_DNS_NAME=$(aws elbv2 describe-load-balancers --load-balancer-arns $ELB_ARN | jq -r '.LoadBalancers[0].DNSName')
             # Test multiple times to verify that the new revision has been deployed across the entire cluster
             for attempt in {1..50}; do
-              curl -s --retry 10 http://$ELB_DNS_NAME | grep -E "Hello World!.*${CIRCLE_SHA1}_${CIRCLE_BUILD_NUM}"
+              curl -s --retry 10 http://$ELB_DNS_NAME | grep -E "python"
             done
 workflows:
   build-deploy:
     jobs:
       - build
+      context: 
+        - global
       - deploy:
           requires:
             - build
+            context:
+              - global
