@@ -52,6 +52,9 @@ jobs:
           name: Load image
           command: |
             docker load --input workspace/docker-image/image.tar
+            docker ls
+            echo "-------now image ls -----"
+            docker image ls
       - run:
           name: Setup common environment variables
           command: |
@@ -65,8 +68,6 @@ jobs:
             #eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
             cd workspace/docker-image/
             ls -la
-            tar -tvf image.tar
-            tar -xvf image.tar python-webapp
             docker push 234548314394.dkr.ecr.us-east-1.amazonaws.com/python-webapp/python-webapp:latest
       - aws-ecs/update-service:
           family: "${ECS_SERVICE_NAME}"
