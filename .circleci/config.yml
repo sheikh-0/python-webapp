@@ -45,7 +45,7 @@ jobs:
       - attach_workspace:
           at: workspace
       - aws-cli/install
-      - aws-cli/configure:
+      - aws-cli/setup:
           aws-access-key-id: "$AWS_ACCESS_KEY_ID"
           aws-region: "$AWS_DEFAULT_REGION"
       - run:
