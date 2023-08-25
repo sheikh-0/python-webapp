@@ -82,10 +82,10 @@ workflows:
   build-deploy:
     jobs:
       - build
-      context: 
-        - global
+          context: 
+           - global
       - deploy:
           requires:
             - build
-            context:
-              - global
+                context:
+                  - global
