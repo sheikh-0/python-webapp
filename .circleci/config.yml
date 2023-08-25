@@ -68,7 +68,7 @@ jobs:
             ls -la
             docker tag python-webapp:latest 234548314394.dkr.ecr.us-east-1.amazonaws.com/python-webapp:latest
             docker push 234548314394.dkr.ecr.us-east-1.amazonaws.com/python-webapp:latest
-      - aws-ecs/deploy-service-update: #update-service:
+      - aws-ecs/deploy_service_update: #update-service:
           family: "${ECS_SERVICE_NAME}"
           cluster-name: "${ECS_CLUSTER_NAME}"
           container-image-name-updates: "container=${ECS_SERVICE_NAME},image-and-tag=python-webapp:latest"
