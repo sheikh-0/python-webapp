@@ -30,9 +30,9 @@ jobs:
 
 workflows:
   build-and-deploy:
+    context:
+      - global
     jobs:
-      context:
-        - global
       - aws-ecr/build-and-push-image: # orb built-in job
           repo: '${MY_APP_PREFIX}'
           tag: '${CIRCLE_SHA1}'
