@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@0.1.4
-  aws-ecs: circleci/aws-ecs@0.0.8
+  aws-ecs: circleci/aws-ecs@4.0.0
   aws-ecr: circleci/aws-ecr@7.2.0
 jobs:
   build:  
@@ -68,7 +68,7 @@ jobs:
             ls -la
             docker tag python-webapp:latest 234548314394.dkr.ecr.us-east-1.amazonaws.com/python-webapp:latest
             docker push 234548314394.dkr.ecr.us-east-1.amazonaws.com/python-webapp:latest
-      - aws-ecs/update-service:
+      - aws-ecs/deploy-service-update: #update-service:
           family: "${ECS_SERVICE_NAME}"
           cluster-name: "${ECS_CLUSTER_NAME}"
           container-image-name-updates: "container=${ECS_SERVICE_NAME},image-and-tag=python-webapp:latest"
