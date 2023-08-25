@@ -81,11 +81,11 @@ jobs:
 workflows:
   build-deploy:
     jobs:
-      - build
+      - build:
           context: 
            - global
       - deploy:
           requires:
             - build
-                context:
-                  - global
+          context:
+            - global
