@@ -10,10 +10,6 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - aws-cli/install
-      - aws-cli/configure:
-          aws-access-key-id: "$AWS_ACCESS_KEY_ID"
-          aws-region: "$AWS_DEFAULT_REGION"
       - run:
           name: Setup common environment variables
           command: |
@@ -69,13 +65,13 @@ jobs:
             echo 'export ECS_CLUSTER_NAME="${AWS_RESOURCE_NAME_PREFIX}-cluster"' >> $BASH_ENV
             echo 'export ECS_SERVICE_NAME="${AWS_RESOURCE_NAME_PREFIX}-service"' >> $BASH_ENV
             echo 'export FULL_IMAGE_NAME="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${AWS_RESOURCE_NAME_PREFIX}:${CIRCLE_SHA1}"' >> $BASH_ENV
-      #- run:
-      #    name: Push image
-      #    command: |
-      #      aws ecr get-login-password | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPOSITORY_NAME} #${AWS_ECR_REGISTRY_URL}
+      - run:
+          name: Push image
+          command: |
+            aws ecr get-login-password | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPOSITORY_NAME} #${AWS_ECR_REGISTRY_URL}
             #eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
-      #      ls -a
-      #      docker push 234548314394.dkr.ecr.us-east-1.amazonaws.com/python-webapp/python-webapp:latest
+            ls -la workspace/
+            docker push 234548314394.dkr.ecr.us-east-1.amazonaws.com/python-webapp/python-webapp:latest
       - aws-ecs/update-service:
           family: "${ECS_SERVICE_NAME}"
           cluster-name: "${ECS_CLUSTER_NAME}"
