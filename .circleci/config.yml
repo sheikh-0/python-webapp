@@ -57,7 +57,7 @@ jobs:
           name: Setup common environment variables
           command: |
             echo 'export ECS_CLUSTER_NAME="cluster"' >> $BASH_ENV #echo 'export ECS_CLUSTER_NAME="${AWS_RESOURCE_NAME_PREFIX}-cluster"' >> $BASH_ENV
-            echo 'export ECS_SERVICE_NAME="service"' >> $BASH_ENV
+            echo 'export ECS_SERVICE_NAME="service"' >> $BASH_ENV #echo 'export ECS_SERVICE_NAME="${AWS_RESOURCE_NAME_PREFIX}-service"' >> $BASH_ENV
             echo 'export FULL_IMAGE_NAME="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${AWS_RESOURCE_NAME_PREFIX}:${CIRCLE_SHA1}"' >> $BASH_ENV
       - run:
           name: Push image
@@ -68,6 +68,18 @@ jobs:
             ls -la
             docker tag python-webapp:latest 234548314394.dkr.ecr.us-east-1.amazonaws.com/python-webapp:latest
             docker push 234548314394.dkr.ecr.us-east-1.amazonaws.com/python-webapp:latest
+      - run:
+          name: Preconfig ECS
+          command: |
+            PREVIOUS_TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition ${ECS_SERVICE_NAME} --include TAGS)
+            CONTAINER_IMAGE_NAME_UPDATES="$(echo container=${ECS_SERVICE_NAME},image-and-tag=python-webapp:latest)"
+            CONTAINER_ENV_VAR_UPDATES="$(echo container=${ECS_SERVICE_NAME},name=VERSION_INFO,value=${CIRCLE_SHA1}_${CIRCLE_BUILD_NUM},container=${ECS_SERVICE_NAME},name=BUILD_DATE,value="$(date)")"
+            echo "PREVIOUS_TASK_DEFINITION:${PREVIOUS_TASK_DEFINITION}"
+            echo "CONTAINER_IMAGE_NAME_UPDATES:${CONTAINER_IMAGE_NAME_UPDATES}"
+            echo "CONTAINER_ENV_VAR_UPDATES:${CONTAINER_ENV_VAR_UPDATES}"
+            echo "ECS_SERVICE_NAME:${ECS_SERVICE_NAME}"
+            echo "CIRCLE_SHA1:${CIRCLE_SHA1}"
+            echo "CIRCLE_BUILD_NUM:${CIRCLE_BUILD_NUM}"
       - aws-ecs/update-service:
           family: "${ECS_SERVICE_NAME}"
           cluster-name: "${ECS_CLUSTER_NAME}"
