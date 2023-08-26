@@ -4,4 +4,5 @@ COPY *.py /opt/docker/
 COPY templates/ /opt/docker/templates
 RUN pip install gunicorn
 CMD ["gunicorn", "server:app", "--reload" ]
-EXPOSE 80 
+EXPOSE 80
+ 
